@@ -1,0 +1,14 @@
+{
+  "ano": 2026,
+  "mes": 8,
+  "eventos": [
+    { "id": "e1", "nome": "Formação ENF",  "inicio": 1,  "fim": 1,  "cor": "azul",     "obs": "" },
+    { "id": "e2", "nome": "",              "inicio": 3,  "fim": 3,  "cor": "celeste",  "obs": "" },
+    { "id": "e3", "nome": "Terço SRB",     "inicio": 12, "fim": 12, "cor": "amarelo",  "obs": "" },
+    { "id": "e4", "nome": "Retiro",        "inicio": 14, "fim": 16, "cor": "laranja",  "obs": "Encontro Colégio Nacional" },
+    { "id": "e5", "nome": "",              "inicio": 24, "fim": 24, "cor": "celeste",  "obs": "" },
+    { "id": "e6", "nome": "Reunião SRB",   "inicio": 28, "fim": 30, "cor": "marinho",  "obs": "Visita Província Nordeste" },
+    { "id": "e7", "nome": "Festiva",       "inicio": 29, "fim": 29, "cor": "rosa",     "obs": "" },
+    { "id": "e8", "nome": "Terço SRB",     "inicio": 31, "fim": 31, "cor": "amarelo",  "obs": "" }
+  ]
+}

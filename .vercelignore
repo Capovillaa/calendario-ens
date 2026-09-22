@@ -1,0 +1,8 @@
+# Só o app vai para o ar. Material de apoio, testes e documentação ficam de fora.
+referencias/
+tests/
+tools/
+.claude/
+*.md
+package.json
+firestore.rules*

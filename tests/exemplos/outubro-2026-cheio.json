@@ -1,0 +1,102 @@
+{
+ "ano": 2026,
+ "mes": 10,
+ "eventos": [
+  {
+   "id": "x0",
+   "nome": "Reunião de equipe com jantar de confraternização na casa do casal responsável",
+   "inicio": 1,
+   "fim": 3,
+   "cor": "azul",
+   "obs": "Observação bem comprida para ver se a linha quebra sem cortar o texto no final"
+  },
+  {
+   "id": "x1",
+   "nome": "Missa",
+   "inicio": 3,
+   "fim": 3,
+   "cor": "amarelo",
+   "obs": ""
+  },
+  {
+   "id": "x2",
+   "nome": "Terço SRB",
+   "inicio": 5,
+   "fim": 5,
+   "cor": "laranja",
+   "obs": ""
+  },
+  {
+   "id": "x3",
+   "nome": "Formação ENF",
+   "inicio": 7,
+   "fim": 7,
+   "cor": "rosa",
+   "obs": "Observação bem comprida para ver se a linha quebra sem cortar o texto no final"
+  },
+  {
+   "id": "x4",
+   "nome": "Retiro anual das equipes do setor e da região Nordeste",
+   "inicio": 9,
+   "fim": 11,
+   "cor": "marinho",
+   "obs": ""
+  },
+  {
+   "id": "x5",
+   "nome": "Festiva",
+   "inicio": 11,
+   "fim": 11,
+   "cor": "celeste",
+   "obs": ""
+  },
+  {
+   "id": "x6",
+   "nome": "Encontro de casais pilotos",
+   "inicio": 13,
+   "fim": 13,
+   "cor": "azul",
+   "obs": "Observação bem comprida para ver se a linha quebra sem cortar o texto no final"
+  },
+  {
+   "id": "x7",
+   "nome": "Visita do casal regional",
+   "inicio": 15,
+   "fim": 15,
+   "cor": "amarelo",
+   "obs": ""
+  },
+  {
+   "id": "x8",
+   "nome": "Aniversário",
+   "inicio": 17,
+   "fim": 19,
+   "cor": "laranja",
+   "obs": ""
+  },
+  {
+   "id": "x9",
+   "nome": "Reunião SRB",
+   "inicio": 19,
+   "fim": 19,
+   "cor": "rosa",
+   "obs": "Observação bem comprida para ver se a linha quebra sem cortar o texto no final"
+  },
+  {
+   "id": "x10",
+   "nome": "Peregrinação",
+   "inicio": 21,
+   "fim": 21,
+   "cor": "marinho",
+   "obs": ""
+  },
+  {
+   "id": "x11",
+   "nome": "Noite de oração",
+   "inicio": 23,
+   "fim": 23,
+   "cor": "celeste",
+   "obs": ""
+  }
+ ]
+}

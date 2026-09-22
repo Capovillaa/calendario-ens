@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Calendário ENS</title>
+  <meta name="description" content="Monte o calendário do mês das Equipes de Nossa Senhora e compartilhe no WhatsApp.">
+  <meta name="theme-color" content="#1B2F66">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Calendário ENS">
+  <link rel="preload" href="assets/fonts/Poppins-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/fonts/Poppins-Bold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="css/imagem.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/vendor/html-to-image.js" defer></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <img src="assets/logo-ens.png" alt="" width="40" height="40">
+    <span class="topo-titulo">Calendário ENS</span>
+    <button type="button" id="btn-menu" class="btn-topo" hidden>Mais opções</button>
+  </header>
+
+  <!-- Carregando -->
+  <section id="tela-carregando" class="tela">
+    <p class="centro">Carregando…</p>
+  </section>
+
+  <!-- Login (só no modo nuvem) -->
+  <section id="tela-login" class="tela" hidden>
+    <div class="cartao centro">
+      <img src="assets/logo-ens.png" alt="Equipes de Nossa Senhora" width="140" height="140">
+      <h1>Calendário ENS</h1>
+      <p>Entre com a sua conta Google para editar o calendário.</p>
+      <button type="button" id="btn-entrar" class="btn btn-primario">Entrar com Google</button>
+      <p id="erro-login" class="erro" role="alert" hidden></p>
+    </div>
+  </section>
+
+  <!-- Conta sem permissão -->
+  <section id="tela-sem-permissao" class="tela" hidden>
+    <div class="cartao centro">
+      <h1>Conta sem permissão</h1>
+      <p>A conta <strong id="email-sem-permissao"></strong> não está liberada para editar este calendário.</p>
+      <p>Peça ao Gabriel para liberar este e-mail, ou entre com outra conta.</p>
+      <button type="button" id="btn-trocar-conta" class="btn btn-primario">Entrar com outra conta</button>
+    </div>
+  </section>
+
+  <!-- App -->
+  <main id="tela-app" class="tela" hidden>
+    <p id="aviso-local" class="aviso" hidden>
+      <strong>Modo de teste:</strong> os eventos ficam salvos só neste aparelho.
+    </p>
+
+    <div id="aviso-instalar" class="aviso aviso-instalar" hidden>
+      <p><strong>Dica:</strong> <span id="texto-instalar"></span></p>
+      <div class="linha-botoes">
+        <button type="button" id="btn-instalar" class="btn btn-primario" hidden>Instalar app</button>
+        <button type="button" id="btn-fechar-instalar" class="btn btn-secundario">Entendi</button>
+      </div>
+    </div>
+
+    <nav class="mes-nav" aria-label="Escolher o mês">
+      <button type="button" id="btn-mes-anterior" class="btn-seta" aria-label="Mês anterior">‹</button>
+      <h1 id="titulo-mes" aria-live="polite"></h1>
+      <button type="button" id="btn-mes-seguinte" class="btn-seta" aria-label="Mês seguinte">›</button>
+    </nav>
+
+    <section aria-labelledby="titulo-eventos">
+      <h2 id="titulo-eventos">Eventos do mês</h2>
+      <p id="aviso-invalidos" class="aviso aviso-erro" role="alert" hidden></p>
+      <ul id="lista-eventos" class="lista-eventos"></ul>
+      <p id="sem-eventos" class="vazio" hidden>Nenhum evento neste mês ainda.</p>
+      <button type="button" id="btn-adicionar" class="btn btn-primario btn-largo">+ Adicionar evento</button>
+    </section>
+
+    <section aria-labelledby="titulo-previa">
+      <h2 id="titulo-previa">Como vai ficar a imagem</h2>
+      <div id="previa" class="previa"><div id="previa-escala" class="previa-escala"></div></div>
+    </section>
+
+    <section class="acoes">
+      <button type="button" id="btn-compartilhar" class="btn btn-whats btn-largo">Compartilhar no WhatsApp</button>
+      <button type="button" id="btn-baixar" class="btn btn-secundario btn-largo">Baixar imagem</button>
+      <p id="status-imagem" class="status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <!-- Formulário do evento -->
+  <dialog id="dlg-evento" class="dialogo" aria-labelledby="titulo-form">
+    <form id="form-evento" method="dialog" novalidate>
+      <h2 id="titulo-form" tabindex="-1">Novo evento</h2>
+
+      <label class="campo">
+        <span class="rotulo">Nome do evento <span class="opcional">(opcional)</span></span>
+        <input type="text" id="campo-nome" name="nome" maxlength="80" autocomplete="off" enterkeyhint="done">
+        <span class="dica">Deixe em branco para só destacar o dia no calendário.</span>
+      </label>
+
+      <label class="campo">
+        <span class="rotulo" id="rotulo-inicio">Dia</span>
+        <select id="campo-inicio" name="inicio"></select>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="campo-varios" name="varios">
+        <span>Evento de mais de um dia</span>
+      </label>
+
+      <label class="campo" id="bloco-fim" hidden>
+        <span class="rotulo">Até o dia</span>
+        <select id="campo-fim" name="fim"></select>
+      </label>
+
+      <fieldset class="campo">
+        <legend class="rotulo">Cor</legend>
+        <div id="campo-cor" class="cores"></div>
+      </fieldset>
+
+      <label class="campo">
+        <span class="rotulo">Observação <span class="opcional">(opcional)</span></span>
+        <input type="text" id="campo-obs" name="obs" maxlength="120" autocomplete="off" enterkeyhint="done">
+        <span class="dica">Aparece em cinza, embaixo do nome.</span>
+      </label>
+
+      <p id="erro-form" class="erro" role="alert" hidden></p>
+
+      <div class="botoes-form">
+        <button type="submit" id="btn-salvar" class="btn btn-primario" value="salvar">Salvar</button>
+        <button type="button" id="btn-cancelar" class="btn btn-secundario">Cancelar</button>
+        <button type="button" id="btn-excluir" class="btn btn-perigo">Excluir evento</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Mais opções -->
+  <dialog id="dlg-menu" class="dialogo" aria-labelledby="titulo-menu">
+    <h2 id="titulo-menu">Mais opções</h2>
+    <div class="menu">
+      <button type="button" id="btn-copiar" class="btn btn-secundario btn-largo">Copiar eventos do mês anterior</button>
+      <button type="button" id="btn-backup" class="btn btn-secundario btn-largo">Fazer backup</button>
+      <button type="button" id="btn-restaurar" class="btn btn-secundario btn-largo">Restaurar backup</button>
+      <button type="button" id="btn-limpar" class="btn btn-perigo btn-largo">Limpar este mês</button>
+      <p id="info-conta" class="dica" hidden></p>
+      <button type="button" id="btn-sair" class="btn btn-secundario btn-largo" hidden>Sair da conta</button>
+      <button type="button" id="btn-fechar-menu" class="btn btn-primario btn-largo">Fechar</button>
+    </div>
+    <input type="file" id="arquivo-backup" accept="application/json,.json" hidden>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

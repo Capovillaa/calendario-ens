@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// MODELO das regras de segurança do Firestore do Calendário ENS.
+// Como usar: copie o conteúdo, troque os e-mails de exemplo pelos e-mails Google reais e cole em
+// Console do Firebase → Firestore Database → Regras → Publicar.
+// Os e-mails reais ficam só no Firebase. Se quiser uma cópia local, salve como `firestore.rules`
+// (esse nome está no .gitignore e não vai para o repositório).
+//
+// Só as contas Google listadas em `autorizado()` leem ou gravam. Qualquer outra pessoa,
+// logada ou não, recebe "permissão negada". Nada pode ser apagado pelo app (só esvaziado).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autorizado() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'pessoa1@exemplo.com',
+          'pessoa2@exemplo.com'
+        ];
+    }
+
+    // Um documento por mês, com id "AAAA-MM" (ex.: 2026-08).
+    function documentoValido(id) {
+      let d = request.resource.data;
+      return id.matches('^20[0-9]{2}-(0[1-9]|1[0-2])$')
+        && d.keys().hasOnly(['ano', 'mes', 'eventos', 'atualizadoEm'])
+        && d.ano is int && d.mes is int
+        && id == string(d.ano) + '-' + (d.mes < 10 ? '0' + string(d.mes) : string(d.mes))
+        && d.eventos is list && d.eventos.size() <= 60
+        && d.atualizadoEm == request.time;
+    }
+
+    match /calendarios/{id} {
+      allow read: if autorizado();
+      allow create, update: if autorizado() && documentoValido(id);
+      allow delete: if false;
+    }
+
+    // Qualquer outro caminho: bloqueado.
+    match /{caminho=**} {
+      allow read, write: if false;
+    }
+  }
+}

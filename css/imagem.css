@@ -1,0 +1,48 @@
+/* Layout da imagem final (protótipo E). CSS copiado de referencias/prototipo-E.html, escopado em .ens-img. */
+
+@font-face { font-family: 'Poppins'; src: url(../assets/fonts/Poppins-Regular.ttf) format('truetype'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'Poppins'; src: url(../assets/fonts/Poppins-Medium.ttf) format('truetype'); font-weight: 500; font-display: block; }
+/* Como no protótipo aprovado: 600 e 700 usam a Bold. */
+@font-face { font-family: 'Poppins'; src: url(../assets/fonts/Poppins-Bold.ttf) format('truetype'); font-weight: 600 700; font-display: block; }
+
+.ens-img, .ens-img * { box-sizing: border-box; margin: 0; padding: 0; }
+.ens-img {
+  width: 1080px;
+  background: #F3F6FB;
+  padding-bottom: 52px;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: #14285C;
+  text-align: left;
+  line-height: normal;
+}
+
+.ens-img .band { height: 400px; background: linear-gradient(135deg, #1B2F66 0%, #2B55B5 60%, #3D7BD9 100%); padding: 52px 60px; position: relative; overflow: hidden; }
+/* No protótipo os anéis são content-box (o `*` não pega pseudo-elementos): a borda soma ao tamanho. */
+.ens-img .band::before, .ens-img .band::after { box-sizing: content-box; }
+.ens-img .band::after { content: ''; position: absolute; right: -120px; top: -120px; width: 420px; height: 420px; border-radius: 50%; border: 48px solid rgba(242, 183, 5, .22); }
+.ens-img .band::before { content: ''; position: absolute; right: 60px; top: 40px; width: 300px; height: 300px; border-radius: 50%; border: 40px solid rgba(238, 116, 51, .18); }
+.ens-img .logo { width: 104px; height: 104px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
+.ens-img .logo img { width: 90px; height: 90px; display: block; }
+.ens-img .m { color: #fff; font-size: 92px; font-weight: 700; line-height: 1; margin-top: 22px; position: relative; z-index: 2; letter-spacing: -1px; }
+.ens-img .m span { color: #F2B705; font-weight: 500; }
+
+.ens-img .wrap { padding: 0 56px; }
+.ens-img .card { margin-top: -60px; position: relative; z-index: 3; background: #fff; border-radius: 28px; box-shadow: 0 14px 40px rgba(20, 40, 90, .14); padding: 26px 26px 22px; }
+.ens-img .mwd, .ens-img .mg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+.ens-img .mwd div { font-size: 22px; font-weight: 600; color: #4A5A85; margin-bottom: 8px; }
+.ens-img .md { height: 62px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 500; color: #14285C; border-radius: 16px; }
+.ens-img .md.sun { color: #C8325F; }
+.ens-img .md.on { font-weight: 700; }
+
+.ens-img .list { margin-top: 26px; background: #fff; border-radius: 28px; box-shadow: 0 6px 24px rgba(20, 40, 90, .08); padding: 10px 30px; }
+.ens-img .row { display: flex; align-items: center; gap: 24px; padding: 18px 0; border-bottom: 2px solid #EEF1F7; }
+.ens-img .row:last-child { border-bottom: none; }
+.ens-img .bar { width: 12px; align-self: stretch; border-radius: 6px; flex-shrink: 0; }
+.ens-img .date { width: 250px; flex-shrink: 0; }
+.ens-img .dn { font-size: 36px; font-weight: 700; color: #14285C; line-height: 1.05; }
+.ens-img .dw { font-size: 20px; color: #4A5A85; font-weight: 500; }
+.ens-img .info { min-width: 0; flex: 1; }
+/* Nomes longos quebram linha, nunca são cortados (PLANO.md, regra 7). */
+.ens-img .en { font-size: 34px; font-weight: 700; color: #14285C; line-height: 1.1; overflow-wrap: anywhere; }
+.ens-img .sub { font-size: 22px; color: #4A5A85; margin-top: 4px; overflow-wrap: anywhere; }

@@ -1,0 +1,43 @@
+# Documentação interna (repositório público)
+CLAUDE.md
+PLANO.md
+LEIA-ME.md
+README.md
+
+# Regras do Firestore com os e-mails reais dos pais: ficam só no Console do Firebase, fora do git.
+# O modelo sem e-mails reais é o firestore.rules.exemplo (esse vai para o repositório).
+firestore.rules
+*.local.rules
+
+# Variáveis de ambiente e segredos (o app não usa, mas nunca devem ir para o git)
+.env
+.env.*
+
+# Dependências e caches de ferramentas
+node_modules/
+.npm/
+.vercel/
+.firebase/
+
+# Logs
+*.log
+npm-debug.log*
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Configurações locais do Claude Code (o launch.json é compartilhado)
+.claude/settings.local.json
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Material de apoio (calendário antigo, protótipo, dados reais): só local
+referencias/
