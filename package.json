@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "dev": "node tools/servidor.js"
+    "dev": "node tools/servidor.js",
+    "dev:local": "node tools/servidor.js --local"
   }
 }

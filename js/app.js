@@ -1,8 +1,8 @@
 // UI do editor (PLANO.md, seção 9).
 
 import {
-  PALETA, NOMES_MESES, DIAS_SEMANA, LIMITES, diasNoMes, diaDaSemana, somarMes, rotuloData, rotuloDiaSemana,
-  temNome, validarEvento, eventosInvalidos, limparDocumento, idDoMes, novoId,
+  PALETA, NOMES_MESES, DIAS_SEMANA, DIAS_SEMANA_CURTOS, LIMITES, diasNoMes, diaDaSemana, somarMes, gerarGrade,
+  eventoDoDia, rotuloData, rotuloDiaSemana, temNome, validarEvento, eventosInvalidos, limparDocumento, idDoMes, novoId,
 } from './calendar.js';
 import { renderizarImagem } from './render.js';
 import { gerarPng, baixar, compartilhar } from './export.js';
@@ -331,18 +331,14 @@ function aoBaixar() {
 
 // ---------- Formulário do evento ----------
 
-function opcoesDeDias(select, selecionado) {
-  const total = diasNoMes(estado.ano, estado.mes);
-  const opcoes = [];
-  for (let d = 1; d <= total; d++) {
-    const o = document.createElement('option');
-    o.value = String(d);
-    o.textContent = `${d} · ${DIAS_SEMANA[diaDaSemana(estado.ano, estado.mes, d)]}`;
-    opcoes.push(o);
-  }
-  select.replaceChildren(...opcoes);
-  select.value = String(Math.min(Math.max(selecionado, 1), total));
-}
+// Dias escolhidos no calendário de toque do formulário.
+// `aguardandoFim`: no modo "mais de um dia", o 1º toque marcou o início e falta tocar no último dia.
+const selecao = { inicio: null, fim: null, aguardandoFim: false };
+
+const nomeDoDia = (d) => DIAS_SEMANA[diaDaSemana(estado.ano, estado.mes, d)].toLowerCase();
+const diaPorExtenso = (d) => `${nomeDoDia(d)}, ${d}`; // "sexta, 14"
+const artigo = (d) => ([0, 6].includes(diaDaSemana(estado.ano, estado.mes, d)) ? 'no' : 'na'); // "no sábado", "na sexta"
+const maiuscula = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
 function montarCores() {
   const opcoes = Object.entries(PALETA).map(([id, cor]) => {
@@ -365,14 +361,101 @@ function montarCores() {
   $('campo-cor').replaceChildren(...opcoes);
 }
 
-function atualizarVariosDias() {
-  const varios = $('campo-varios').checked;
-  $('bloco-fim').hidden = !varios;
-  $('rotulo-inicio').textContent = varios ? 'Do dia' : 'Dia';
-  if (varios && Number($('campo-fim').value) <= Number($('campo-inicio').value)) {
-    const total = diasNoMes(estado.ano, estado.mes);
-    $('campo-fim').value = String(Math.min(Number($('campo-inicio').value) + 1, total));
+const corEscolhida = () => document.querySelector('input[name=cor]:checked')?.value ?? 'azul';
+
+function textoResumo(varios) {
+  const { inicio, fim, aguardandoFim } = selecao;
+  const mes = noMeioDaFrase(estado.mes);
+  if (inicio === null) return varios ? 'Toque no primeiro dia do evento.' : 'Toque no dia do evento.';
+  if (varios && aguardandoFim) return `Começa ${artigo(inicio)} ${diaPorExtenso(inicio)}. Agora toque no último dia.`;
+  if (varios && fim > inicio) {
+    return `De ${diaPorExtenso(inicio)} até ${diaPorExtenso(fim)} de ${mes} (${fim - inicio + 1} dias).`;
   }
+  return `${maiuscula(diaPorExtenso(inicio))} de ${mes}.`;
+}
+
+/** Desenha o calendário de toque: dias escolhidos pintados na cor escolhida, como na imagem. */
+function renderizarSeletorDias() {
+  const varios = $('campo-varios').checked;
+  const { inicio, fim, aguardandoFim } = selecao;
+  const cor = PALETA[corEscolhida()];
+  const outros = estado.doc.eventos.filter(
+    (e) => e.id !== estado.editandoId && validarEvento(e, estado.ano, estado.mes).length === 0,
+  );
+  let temPontos = false;
+
+  const celulas = DIAS_SEMANA_CURTOS.map((nome) => {
+    const c = document.createElement('span');
+    c.className = 'sd-sem';
+    c.textContent = nome;
+    c.setAttribute('aria-hidden', 'true');
+    return c;
+  });
+  gerarGrade(estado.ano, estado.mes).flat().forEach((dia, i) => {
+    if (dia === null) { celulas.push(document.createElement('span')); return; }
+    const escolhido = inicio !== null && dia >= inicio && dia <= fim;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'sd-dia';
+    b.textContent = String(dia);
+    b.dataset.dia = String(dia);
+    if (i % 7 === 0) b.classList.add('dom');
+    if (escolhido) {
+      b.classList.add('sel');
+      b.style.background = cor.fundo;
+      b.style.color = cor.texto;
+    }
+    if (varios && aguardandoFim && dia === inicio) b.classList.add('pendente');
+    b.setAttribute('aria-pressed', String(escolhido));
+    b.setAttribute('aria-label', maiuscula(diaPorExtenso(dia)));
+    const outro = escolhido ? null : eventoDoDia(outros, dia);
+    if (outro) {
+      const ponto = document.createElement('span');
+      ponto.className = 'sd-ponto';
+      ponto.style.background = PALETA[outro.cor].fundo;
+      b.append(ponto);
+      temPontos = true;
+    }
+    celulas.push(b);
+  });
+
+  $('seletor-dias').replaceChildren(...celulas);
+  $('dica-pontos').hidden = !temPontos;
+  $('rotulo-dias').textContent = varios ? 'Dias do evento' : 'Dia do evento';
+  $('resumo-dias').textContent = textoResumo(varios);
+}
+
+function aoTocarDia(dia) {
+  if (!$('campo-varios').checked) {
+    selecao.inicio = selecao.fim = dia;
+  } else if (selecao.aguardandoFim && selecao.inicio !== null) {
+    if (dia === selecao.inicio) return;
+    if (dia < selecao.inicio) {
+      selecao.fim = selecao.inicio;
+      selecao.inicio = dia;
+    } else {
+      selecao.fim = dia;
+    }
+    selecao.aguardandoFim = false;
+  } else {
+    // Recomeça: este é o primeiro dia; o próximo toque será o último.
+    selecao.inicio = selecao.fim = dia;
+    selecao.aguardandoFim = true;
+  }
+  mostrarErroForm('');
+  renderizarSeletorDias();
+}
+
+function aoMudarVarios() {
+  if ($('campo-varios').checked) {
+    // Mantém o dia já escolhido como início e pede o último.
+    selecao.aguardandoFim = selecao.inicio !== null;
+  } else {
+    selecao.fim = selecao.inicio;
+    selecao.aguardandoFim = false;
+  }
+  mostrarErroForm('');
+  renderizarSeletorDias();
 }
 
 function mostrarErroForm(texto) {
@@ -387,38 +470,49 @@ function abrirFormulario(evento) {
     toast(`Limite de ${LIMITES.eventos} eventos por mês.`, 4000);
     return;
   }
-  const ev = evento ?? { nome: '', inicio: 1, fim: 1, cor: 'azul', obs: '' };
+  const ev = evento ?? { nome: '', inicio: null, fim: null, cor: 'azul', obs: '' };
   estado.editandoId = evento?.id ?? null;
+
+  // Evento com dia que não existe no mês (ex.: 31 em setembro) abre sem dia marcado, para corrigir.
+  const diasValidos = ev.inicio !== null && ev.fim <= diasNoMes(estado.ano, estado.mes);
+  selecao.inicio = diasValidos ? ev.inicio : null;
+  selecao.fim = diasValidos ? ev.fim : null;
+  selecao.aguardandoFim = false;
 
   $('titulo-form').textContent = novo ? 'Novo evento' : 'Editar evento';
   $('campo-nome').value = ev.nome;
   $('campo-obs').value = ev.obs;
-  opcoesDeDias($('campo-inicio'), ev.inicio);
-  opcoesDeDias($('campo-fim'), ev.fim);
-  $('campo-varios').checked = ev.fim > ev.inicio;
-  atualizarVariosDias();
+  $('campo-varios').checked = ev.inicio !== null && ev.fim > ev.inicio;
   for (const r of document.querySelectorAll('input[name=cor]')) r.checked = r.value === ev.cor;
   $('btn-excluir').hidden = novo;
+  renderizarSeletorDias();
 
-  const total = diasNoMes(estado.ano, estado.mes);
-  mostrarErroForm(ev.inicio > total || ev.fim > total
-    ? `O dia ${ev.fim > total ? ev.fim : ev.inicio} não existe em ${noMeioDaFrase(estado.mes)}. Escolha outro dia e salve.`
+  mostrarErroForm(ev.inicio !== null && !diasValidos
+    ? `O dia ${ev.fim} não existe em ${noMeioDaFrase(estado.mes)}. Toque no dia certo e salve.`
     : '');
 
   $('dlg-evento').showModal();
+  $('dlg-evento').scrollTop = 0;
   $('titulo-form').focus();
 }
 
 function aoSalvarEvento(e) {
   e.preventDefault();
-  const inicio = Number($('campo-inicio').value);
-  const cor = document.querySelector('input[name=cor]:checked')?.value;
+  const varios = $('campo-varios').checked;
+  if (selecao.inicio === null) {
+    mostrarErroForm(varios ? 'Toque no primeiro e no último dia do evento.' : 'Toque no dia do evento.');
+    return;
+  }
+  if (varios && selecao.aguardandoFim) {
+    mostrarErroForm('Falta o último dia: toque nele no calendário.');
+    return;
+  }
   const ev = {
     id: estado.editandoId ?? novoId(),
     nome: $('campo-nome').value.trim(),
-    inicio,
-    fim: $('campo-varios').checked ? Number($('campo-fim').value) : inicio,
-    cor,
+    inicio: selecao.inicio,
+    fim: varios ? selecao.fim : selecao.inicio,
+    cor: corEscolhida(),
     obs: $('campo-obs').value.trim(),
   };
   const erros = validarEvento(ev, estado.ano, estado.mes);
@@ -597,8 +691,12 @@ function ligarEventos() {
   $('form-evento').addEventListener('submit', aoSalvarEvento);
   $('btn-cancelar').addEventListener('click', () => $('dlg-evento').close());
   $('btn-excluir').addEventListener('click', aoExcluirEvento);
-  $('campo-varios').addEventListener('change', atualizarVariosDias);
-  $('campo-inicio').addEventListener('change', atualizarVariosDias);
+  $('campo-varios').addEventListener('change', aoMudarVarios);
+  $('campo-cor').addEventListener('change', renderizarSeletorDias);
+  $('seletor-dias').addEventListener('click', (e) => {
+    const botao = e.target.closest('.sd-dia');
+    if (botao) aoTocarDia(Number(botao.dataset.dia));
+  });
 
   $('btn-menu').addEventListener('click', () => $('dlg-menu').showModal());
   $('btn-fechar-menu').addEventListener('click', () => $('dlg-menu').close());

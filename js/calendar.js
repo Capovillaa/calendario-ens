@@ -9,6 +9,11 @@ export const PALETA = {
   rosa:    { nome: 'Rosa',         fundo: '#E0457B', texto: '#FFFFFF' },
   marinho: { nome: 'Azul-marinho', fundo: '#1B2F66', texto: '#FFFFFF' },
   celeste: { nome: 'Azul-claro',   fundo: '#8FB8E8', texto: '#12305F' },
+  verde:    { nome: 'Verde',       fundo: '#2E8B57', texto: '#FFFFFF' },
+  roxo:     { nome: 'Roxo',        fundo: '#7B4FC9', texto: '#FFFFFF' },
+  vermelho: { nome: 'Vermelho',    fundo: '#C62828', texto: '#FFFFFF' },
+  marrom:   { nome: 'Marrom',      fundo: '#8A5A3B', texto: '#FFFFFF' },
+  lilas:    { nome: 'Lilás',       fundo: '#B9A2E8', texto: '#2D1B5C' },
 };
 
 export const NOMES_MESES = [

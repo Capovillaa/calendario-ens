@@ -104,20 +104,17 @@
         <span class="dica">Deixe em branco para só destacar o dia no calendário.</span>
       </label>
 
-      <label class="campo">
-        <span class="rotulo" id="rotulo-inicio">Dia</span>
-        <select id="campo-inicio" name="inicio"></select>
-      </label>
-
       <label class="check">
         <input type="checkbox" id="campo-varios" name="varios">
         <span>Evento de mais de um dia</span>
       </label>
 
-      <label class="campo" id="bloco-fim" hidden>
-        <span class="rotulo">Até o dia</span>
-        <select id="campo-fim" name="fim"></select>
-      </label>
+      <fieldset class="campo">
+        <legend class="rotulo" id="rotulo-dias">Dia do evento</legend>
+        <p id="resumo-dias" class="resumo-dias" aria-live="polite"></p>
+        <div id="seletor-dias" class="seletor-dias"></div>
+        <p id="dica-pontos" class="dica" hidden>Os pontinhos mostram os dias que já têm outro evento.</p>
+      </fieldset>
 
       <fieldset class="campo">
         <legend class="rotulo">Cor</legend>
@@ -130,12 +127,14 @@
         <span class="dica">Aparece em cinza, embaixo do nome.</span>
       </label>
 
-      <p id="erro-form" class="erro" role="alert" hidden></p>
+      <button type="button" id="btn-excluir" class="btn btn-perigo btn-largo">Excluir evento</button>
 
-      <div class="botoes-form">
-        <button type="submit" id="btn-salvar" class="btn btn-primario" value="salvar">Salvar</button>
-        <button type="button" id="btn-cancelar" class="btn btn-secundario">Cancelar</button>
-        <button type="button" id="btn-excluir" class="btn btn-perigo">Excluir evento</button>
+      <div class="rodape-form">
+        <p id="erro-form" class="erro" role="alert" hidden></p>
+        <div class="botoes-form">
+          <button type="button" id="btn-cancelar" class="btn btn-secundario">Cancelar</button>
+          <button type="submit" id="btn-salvar" class="btn btn-primario" value="salvar">Salvar</button>
+        </div>
       </div>
     </form>
   </dialog>

@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import {
   diasNoMes, diaDaSemana, somarMes, gerarGrade, eventoDoDia,
   montarCalendario, montarLista, validarEvento, eventosInvalidos, corDe,
-  idDoMes, limparDocumento,
+  idDoMes, limparDocumento, PALETA,
 } from '../js/calendar.js';
 
 const agosto = JSON.parse(readFileSync(new URL('./exemplos/agosto-2026.json', import.meta.url), 'utf8'));
@@ -133,7 +133,7 @@ test('validação bloqueia dias fora do mês e fim antes do início', () => {
   assert.deepEqual(validarEvento({ inicio: 29, fim: 29, cor: 'azul' }, 2028, 2), []);
   assert.deepEqual(validarEvento({ inicio: 10, fim: 8, cor: 'azul' }, 2026, 8),
     ['O dia final não pode ser antes do dia inicial.']);
-  assert.deepEqual(validarEvento({ inicio: 1, fim: 1, cor: 'verde' }, 2026, 8), ['Escolha uma cor.']);
+  assert.deepEqual(validarEvento({ inicio: 1, fim: 1, cor: 'fucsia' }, 2026, 8), ['Escolha uma cor.']);
 });
 
 test('trocar agosto para setembro aponta os eventos que não cabem', () => {
@@ -142,7 +142,7 @@ test('trocar agosto para setembro aponta os eventos que não cabem', () => {
 });
 
 test('cor desconhecida cai no azul em vez de quebrar', () => {
-  assert.equal(corDe('verde').fundo, '#2B55B5');
+  assert.equal(corDe('fucsia').fundo, '#2B55B5');
 });
 
 test('idDoMes usa dois dígitos no mês', () => {
@@ -158,7 +158,7 @@ test('limparDocumento remove campos estranhos e corrige tipos', () => {
   const sujo = {
     ano: 2026, mes: 8, extra: 'x',
     eventos: [
-      { id: 'a', nome: 'Ok', inicio: 1, fim: 1, cor: 'roxo', obs: 5, hack: '<script>' },
+      { id: 'a', nome: 'Ok', inicio: 1, fim: 1, cor: 'fucsia', obs: 5, hack: '<script>' },
       { id: 'a', nome: 'Id repetido', inicio: 2, fim: 2, cor: 'rosa' },
       { nome: 'Sem dias' },
       { id: 'b', nome: 'x'.repeat(500), inicio: 3, fim: 3, cor: 'azul', obs: '' },
@@ -176,4 +176,14 @@ test('limparDocumento usa o mês padrão e recusa documento sem mês', () => {
   assert.deepEqual(limparDocumento(null, 2026, 10), { ano: 2026, mes: 10, eventos: [] });
   assert.throws(() => limparDocumento({ eventos: [] }));
   assert.throws(() => limparDocumento({ ano: 2026, mes: 13, eventos: [] }));
+});
+
+test('paleta tem 11 cores, todas com fundo e texto em hexadecimal', () => {
+  const cores = Object.values(PALETA);
+  assert.equal(cores.length, 11);
+  for (const c of cores) {
+    assert.match(c.fundo, /^#[0-9A-F]{6}$/);
+    assert.match(c.texto, /^#[0-9A-F]{6}$/);
+  }
+  assert.equal(limparDocumento({ ano: 2026, mes: 8, eventos: [{ id: 'v', nome: 'x', inicio: 1, fim: 1, cor: 'verde' }] }).eventos[0].cor, 'verde');
 });

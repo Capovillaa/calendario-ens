@@ -1,6 +1,7 @@
 // Servidor local para testar: serve os arquivos e aplica os mesmos cabeçalhos do vercel.json
 // (inclusive a Content-Security-Policy), para os problemas aparecerem aqui e não em produção.
 // Uso: node tools/servidor.js  →  http://localhost:5173
+//      node tools/servidor.js --local  →  http://localhost:5174, ignora o Firebase e roda em modo local (dados só no navegador)
 
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
@@ -8,7 +9,9 @@ import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const RAIZ = fileURLToPath(new URL('..', import.meta.url));
-const PORTA = Number(process.env.PORT) || 5173;
+const MODO_LOCAL = process.argv.includes('--local');
+const PORTA = Number(process.env.PORT) || (MODO_LOCAL ? 5174 : 5173);
+const CONFIG_VAZIA = "export const firebaseConfig = { apiKey: '', authDomain: '', projectId: '', appId: '' };\n";
 
 const TIPOS = {
   '.html': 'text/html; charset=utf-8',
@@ -42,7 +45,7 @@ createServer(async (req, res) => {
   }
   try {
     if ((await stat(arquivo)).isDirectory()) arquivo = join(arquivo, 'index.html');
-    const corpo = await readFile(arquivo);
+    const corpo = MODO_LOCAL && caminho === '/js/firebase-config.js' ? CONFIG_VAZIA : await readFile(arquivo);
     res.writeHead(200, {
       'Content-Type': TIPOS[extname(arquivo)] ?? 'application/octet-stream',
       'Cache-Control': 'no-cache',
@@ -52,4 +55,4 @@ createServer(async (req, res) => {
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Não encontrado');
   }
-}).listen(PORTA, () => console.log(`Calendário ENS em http://localhost:${PORTA}`));
+}).listen(PORTA, () => console.log(`Calendário ENS em http://localhost:${PORTA}${MODO_LOCAL ? ' (modo local)' : ''}`));
